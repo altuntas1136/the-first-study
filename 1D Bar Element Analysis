@@ -1,0 +1,103 @@
+print("\n_____________  Analysis of 1D Beam  ___________\n")
+print('\n|               P\n|_______________\u2192\n|       L\n\n\n')
+
+
+P=5
+E=100
+A=1
+L=10
+import numpy as np
+from matplotlib import pyplot as plt
+
+
+
+
+
+
+
+mesh=5
+el = float(L/mesh)
+
+
+
+
+
+
+Force = np.array([[P],[0]])
+F = np.zeros(mesh+1)
+F[mesh:1+mesh] = F[mesh:1+mesh]+Force[0]
+
+print("\nForce Matrix :\n")
+for i in F:
+    print(i)
+    
+    
+kb =  ((E*(A))/((el)))*np.array([[1,-1],[-1,1]])
+
+
+print(("\n\n Stifness Matrix :\n"), kb)
+
+
+
+K = np.zeros((1+mesh,1+mesh))
+
+for i in range(2):
+    for j in range(2):
+        #print(j)
+        K[i,j]=kb[i,j]
+#print(K)
+
+
+k=1
+while k<mesh:
+    p=k
+    i=1
+    while i<=2:
+        j=1
+        q=k
+        while j<=2:
+            K[(p,p),(q,q)]=K[(p,p),(q,q)]+kb[i-1,j-1]
+            j=j+1
+            q=q+1
+        i=i+1
+        p=p+1
+    k=k+1
+    
+print("\n\n Solved Matrix :\n")
+print(K)
+
+Kinv = np.linalg.inv(K[1:mesh+1,1:mesh+1])
+##print(Kinv)
+
+D = np.zeros((mesh+1))
+D[1:mesh+1] = np.dot(Kinv,F[1:mesh+1])
+
+print("\n Displacement : \n")
+for i in D:
+    print(round(i, 4))
+    
+    
+    
+x = np.arange(0,L+el,el)
+y = np.zeros((mesh+1))
+
+
+p=0
+for i in range(mesh+1):
+    if i%1==0:
+        y[p]=D[i]
+        p=p+1
+    
+        
+
+from pylab import *
+figure(figsize=(14,7))
+plt.subplot(3,1,1)   
+plt.plot(x,y,"-or")
+plt.grid(linewidth=0.5,color="k")
+plt.title("Displacement for 1D Beam "+str(mesh)+" elements") 
+plt.xlabel("Length of Beam")
+plt.ylabel("Displacement")
+plt.savefig(""+str(mesh)+" Element.png")
+xticks([0,1,2,3,4,5,6,7,8,9,10])
+yticks([0.1,0.2,0.3,0.4,0.5])
